@@ -1,5 +1,8 @@
 package application;
 	
+import java.io.File;
+import java.net.URL;
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -11,7 +14,12 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("Sample.fxml"));
+			
+			FXMLLoader loader = new FXMLLoader();
+			File fxmlFile = new File("src/application/Main.fxml");
+			URL fxmlUrl = fxmlFile.toURI().toURL();
+			loader.setLocation(fxmlUrl);
+			BorderPane root = loader.<BorderPane>load();
 			Scene scene = new Scene(root,800,600);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
