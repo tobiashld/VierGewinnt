@@ -57,7 +57,7 @@ public class MainController {
 	
 	public MainController() {
 //		System.out.println(ersterButton00.getId());
-		buttonMap.put(ersterButton00.getId(),ersterButton00);
+		buttonMap.put((String) ersterButton00.getId(),ersterButton00);
 //		buttonMap.put(ersterButton01,ersterButton01.getId().toString());
 //		buttonMap.put(ersterButton02,ersterButton02.getId().toString());
 //		buttonMap.put(ersterButton03,ersterButton03.getId().toString());
@@ -92,7 +92,7 @@ public class MainController {
 //		buttonMap.put(ersterButton44,ersterButton44.getId().toString());
 //		buttonMap.put(ersterButton45,ersterButton45.getId().toString());
 //		buttonMap.put(ersterButton46,ersterButton46.getId().toString());
-		buttonMap.put(ersterButton50.getId(),ersterButton50);
+		buttonMap.put((String) ersterButton50.getId(),ersterButton50);
 //		buttonMap.put(ersterButton51,ersterButton51.getId().toString());
 //		buttonMap.put(ersterButton52,ersterButton52.getId().toString());
 //		buttonMap.put(ersterButton53,ersterButton53.getId().toString());
@@ -167,7 +167,9 @@ public class MainController {
 		}
 		System.out.println(ersterButton50.getId().toString());
 		//System.out.println(buttonArray[5][0].getStyle().toString());
-		buttonMap.get("ersterButton"+letzterStein+reihe).setStyle("-fx-background-color:red");
+		
+		System.out.println("ersterButton".concat(Integer.toString(letzterStein)+Integer.toString(reihe)));
+		buttonMap.get("ersterButton".concat(Integer.toString(letzterStein)+Integer.toString(reihe))).setStyle("-fx-background-color:red");
 	}
 	
 }
