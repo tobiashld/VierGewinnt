@@ -6,6 +6,7 @@ import java.net.URL;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
 
@@ -16,14 +17,14 @@ public class Main extends Application {
 		try {
 			
 			FXMLLoader loader = new FXMLLoader();
-			File fxmlFile = new File("src/application/Main.fxml");
+			File fxmlFile = new File("src/application/hauptmenue.fxml");
 			URL fxmlUrl = fxmlFile.toURI().toURL();
 			loader.setLocation(fxmlUrl);
-			BorderPane root = loader.<BorderPane>load();
+			//BorderPane root = loader.<BorderPane>load();
+			AnchorPane root = loader.<AnchorPane>load();
 			Scene scene = new Scene(root,800,600);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setFullScreen(true);
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
