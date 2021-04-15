@@ -20,6 +20,8 @@ public class MainController {
 	HashMap<String,Button> buttonMap = new HashMap<>();
 	int aktSpieler = 1;
 	String[] spielerName = new String[2];
+	int[] spielstand = new int[2];
+	
 	@FXML
 	public Button ersterButton00 = new Button();
 	public Button ersterButton01 = new Button();
@@ -63,27 +65,32 @@ public class MainController {
 	public Button ersterButton54 = new Button();
 	public Button ersterButton55 = new Button();
 	public Button ersterButton56 = new Button();
-	public Label gewonnenLabel = new Label();
-	public GridPane gridpane = new GridPane();
+	
+	public Button spielStartenButton = new Button();
 	public Button neuesSpielButton = new Button();
 	public Button hauptmenueButton = new Button();
+	public Button partieWeiterspielenButton = new Button();
+	
+	public GridPane gridpane = new GridPane();
+	
 	public TextField spielerEins = new TextField();
 	public TextField spielerZwei = new TextField();
+	
+	public Label gewonnenLabel = new Label();
 	public Label spielerEinsLabel = new Label();
 	public Label spielerZweiLabel = new Label();
-	public Button spielStartenButton = new Button();
-	
-	public MainController() {
-//		System.out.println(ersterButton00.getId());
-		
-//		
-	
-	}
+	public Label spielerEinsAnzeige = new Label();
+	public Label spielerEinsAnzeigeLabel = new Label();
+	public Label spielerZweiAnzeige = new Label();
+	public Label spielerZweiAnzeigeLabel = new Label();
+
 	
 	@FXML
 	public void initialize() {
 		mapInitialisieren();
 	}
+	
+	
 	
 	public void mapInitialisieren() {
 
@@ -165,6 +172,8 @@ public class MainController {
 	public void siebteReiheAusgewaehlt(ActionEvent event) throws IOException{
 		verarbeiteSpielzug(6, event);
 	}
+	
+	
 	private void verarbeiteSpielzug(int reihe,ActionEvent event) throws IOException {
 		int tempErg = spielfeld1.setzeSpieler(reihe, aktSpieler);
 		switch(tempErg) {
@@ -182,22 +191,42 @@ public class MainController {
 					break;		
 		}
 	}
+	
+	
+	
 	private void displayGewonnenScreen(ActionEvent event) throws IOException {
-//		Parent tableviewparent = FXMLLoader.load(getClass().getResource("gewonnen.fxml"));
-//		Scene tableviewscene = new Scene(tableviewparent,300,300);
-//		Stage window = (Stage) ((Node)event.getSource()).getScene().getWindow();
-//		window.setScene(tableviewscene);
-//		window.show();
+		for(String s : buttonMap.keySet()) {
+			Button temp_button = buttonMap.get(s);
+			temp_button.setDisable(true);
+		}
+		gridpane.setOpacity(0.5);
 		if(!gewonnenLabel.isVisible()) {
-			gewonnenLabel.setMaxHeight(600);
-			gewonnenLabel.setMaxWidth(800);
 			gewonnenLabel.setText(spielerName[aktSpieler-1] + " hat gewonnen!");
+			spielstand[aktSpieler-1]++;
+			if(aktSpieler == 1) {
+				spielerEinsAnzeige.setText(Integer.toString(spielstand[aktSpieler-1]));
+			}else if(aktSpieler == 2) {
+				spielerZweiAnzeige.setText(Integer.toString(spielstand[aktSpieler-1]));
+			}
 			neuesSpielButton.setVisible(true);
-			gridpane.setOpacity(0);
-			hauptmenueButton.setVisible(true);
 			gewonnenLabel.setVisible(true);
+			partieWeiterspielenButton.setVisible(true);
 		}
 	}
+	
+	public void partieWeiterspielen() {
+		for(String s : buttonMap.keySet()) {
+			Button temp_button = buttonMap.get(s);
+			temp_button.setStyle("-fx-background-radius:80px;");
+			temp_button.setDisable(false);
+		}
+		gridpane.setOpacity(1);;
+		neuesSpielButton.setVisible(false);
+		gewonnenLabel.setVisible(false);
+		partieWeiterspielenButton.setVisible(false);
+		spielfeld1.spielfeldReset();
+	}
+	
 	public void spielStarten() {
 		if(!spielerEins.getText().equals("") && !spielerZwei.getText().equals("")) {
 			spielerName[0] = spielerEins.getText();
@@ -206,6 +235,17 @@ public class MainController {
 			spielerName[0] = "Spieler 1";
 			spielerName[1] = "Spieler 2";
 		}
+		
+		spielstand[0] = 0;
+		spielstand[1] = 0;
+		
+		spielerEinsAnzeigeLabel.setText(spielerName[0]);
+		spielerZweiAnzeigeLabel.setText(spielerName[1]);
+		spielerEinsAnzeigeLabel.setVisible(true);
+		spielerEinsAnzeige.setVisible(true);
+		spielerZweiAnzeigeLabel.setVisible(true);
+		spielerZweiAnzeige.setVisible(true);
+		
 		spielerEins.setVisible(false);
 		spielerZwei.setVisible(false);
 		spielStartenButton.setVisible(false);

@@ -23,7 +23,9 @@ public class Main extends Application {
 			//BorderPane root = loader.<BorderPane>load();
 			AnchorPane root = loader.<AnchorPane>load();
 			Scene scene = new Scene(root,800,600);
+			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setTitle("Vier Gewinnt");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {

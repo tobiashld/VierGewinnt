@@ -9,13 +9,16 @@ public class Spielfeld {
 	private static int[][] spielfeld = new int[6][7];
 	
 	public Spielfeld() {
+		spielfeldReset();
+	}
+	
+	public void spielfeldReset() {
 		for(int i = 0;i < 6; i++) {
 			for(int z = 0;z < 7;z++) {
 				spielfeld[i][z] = 0;
 			}
 		}
 	}
-	
 	public int getSpielfeldAt(int y,int x) {
 		return spielfeld[y][x];
 	}

@@ -23,6 +23,6 @@
             <Font name="Arial Black" size="20.0" />
          </font>
       </Label>
-      <Button layoutX="188.0" layoutY="398.0" mnemonicParsing="false" text="Neues Spiel" />
+      <Button layoutX="188.0" layoutY="398.0" mnemonicParsing="false" onAction="#oneOnJarvis" text="Neues Spiel" />
    </children>
 </AnchorPane>

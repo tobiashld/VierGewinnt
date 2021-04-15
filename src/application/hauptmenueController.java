@@ -24,4 +24,11 @@ public class hauptmenueController {
 		window.show();
 	}
 	
+	public void oneOnJarvis(ActionEvent event) throws IOException {
+		Parent tableviewparent = FXMLLoader.load(getClass().getResource("MainComputer.fxml"));
+		Scene tableviewscene = new Scene(tableviewparent,800,600);
+		Stage window = (Stage) ((Node)event.getSource()).getScene().getWindow();
+		window.setScene(tableviewscene);
+		window.show();
+	}
 }
