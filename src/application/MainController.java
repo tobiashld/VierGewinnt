@@ -16,11 +16,16 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class MainController {
-	Spielfeld spielfeld1 = new Spielfeld();
+	private static final int GEWONNEN = 1;
+	private static final int NICHT_GEWONNEN = 0;
+	private static final int REIHE_VOLL = -1;
+	private static final int FEHLER = -2;
+	
+	Spielfeld vierGewinntFeld = new Spielfeld();
 	HashMap<String,Button> buttonMap = new HashMap<>();
 	int aktSpieler = 1;
-	String[] spielerName = new String[2];
-	int[] spielstand = new int[2];
+	String[] spielerNamenArr = new String[2];
+	int[] spielstandArr = new int[2];
 	
 	@FXML
 	public Button ersterButton00 = new Button();
@@ -173,79 +178,133 @@ public class MainController {
 		verarbeiteSpielzug(6, event);
 	}
 	
-	
-	private void verarbeiteSpielzug(int reihe,ActionEvent event) throws IOException {
-		int tempErg = spielfeld1.setzeSpieler(reihe, aktSpieler);
+	/*
+	 * Das Ergebnis eines Spielzugs wird verarbeitet und ausgewertet
+	 * Anschließend werden die entsprechenden Methoden ausgeführt
+	 */
+	public void verarbeiteSpielzug(int reihe,ActionEvent event) throws IOException {
+		int tempErg = vierGewinntFeld.setzeSpieler(reihe, aktSpieler);
 		switch(tempErg) {
-			case -2:System.out.println("Fehler");
-					break;
-			case -1:System.out.println("Reihe Voll");
-					break;
-			case 0 :faerbeButton(reihe);
-					wechsleSpieler();
-					break;
-			case 1 :faerbeButton(reihe);
-					System.out.println("gewonnen");
-					displayGewonnenScreen(event);
-					//alle button disablen und so shit halt
-					break;		
+			case FEHLER:
+				System.out.println("Fehler");
+				fehlerVerarbeiten("Fehler!");
+				break;
+						
+			case REIHE_VOLL:
+				System.out.println("Reihe Voll");
+				fehlerVerarbeiten("Reihe Voll!");
+				break;
+							
+			case NICHT_GEWONNEN:
+				faerbeButton(reihe);
+				wechsleSpieler();
+				break;
+								
+			case GEWONNEN:
+				faerbeButton(reihe);
+				System.out.println("gewonnen");
+				displayGewonnenScreen(event);
+				break;		
 		}
 	}
 	
+	/*
+	 * Der im Parameter dieser Methode angegebene Fehler wird im Spielfeld angezeigt und bleibt dort für eine Sekunde
+	 */
+	protected void fehlerVerarbeiten(String fehler){
+		gewonnenLabel.setText(fehler);
+		gridpane.setOpacity(0.5);
+		gewonnenLabel.setVisible(true);
+		try {
+			wait(1);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		gridpane.setOpacity(1);
+		gewonnenLabel.setVisible(false);
+	}
 	
-	
+	/*
+	 * Alle Buttons werden Disabled und der Gewinner wird angezeigt
+	 */
 	private void displayGewonnenScreen(ActionEvent event) throws IOException {
+		
 		for(String s : buttonMap.keySet()) {
 			Button temp_button = buttonMap.get(s);
 			temp_button.setDisable(true);
 		}
-		gridpane.setOpacity(0.5);
-		if(!gewonnenLabel.isVisible()) {
-			gewonnenLabel.setText(spielerName[aktSpieler-1] + " hat gewonnen!");
-			spielstand[aktSpieler-1]++;
-			if(aktSpieler == 1) {
-				spielerEinsAnzeige.setText(Integer.toString(spielstand[aktSpieler-1]));
-			}else if(aktSpieler == 2) {
-				spielerZweiAnzeige.setText(Integer.toString(spielstand[aktSpieler-1]));
-			}
-			neuesSpielButton.setVisible(true);
-			gewonnenLabel.setVisible(true);
-			partieWeiterspielenButton.setVisible(true);
+		spielstandArr[aktSpieler-1]++;
+		
+		if(aktSpieler == 1) {
+			spielerEinsAnzeige.setText(Integer.toString(spielstandArr[aktSpieler-1]));
+		}else if(aktSpieler == 2) {
+			spielerZweiAnzeige.setText(Integer.toString(spielstandArr[aktSpieler-1]));
 		}
+		
+		gewonnenScreenVerarbeitung(true, 0.5);
+		gewonnenLabel.setText(spielerNamenArr[aktSpieler-1] + " hat gewonnen!");
+		
+		
 	}
 	
+	
+	
+	/*
+	 * Alle Buttons werden wieder Enabled und der Gewonnenscreen verschwindet
+	 * Anschließend wird das Spielfeld resettet
+	 */
 	public void partieWeiterspielen() {
+		
 		for(String s : buttonMap.keySet()) {
 			Button temp_button = buttonMap.get(s);
 			temp_button.setStyle("-fx-background-radius:80px;");
 			temp_button.setDisable(false);
 		}
-		gridpane.setOpacity(1);;
-		neuesSpielButton.setVisible(false);
-		gewonnenLabel.setVisible(false);
-		partieWeiterspielenButton.setVisible(false);
-		spielfeld1.spielfeldReset();
+		
+		gewonnenScreenVerarbeitung(false, 1);
+		vierGewinntFeld.spielfeldReset();
 	}
 	
+	/*
+	 * Die Navigationsbuttons und das Gewonnenlabel werden aus- oder eingeblendet
+	 * Die Deckkraft des Gridpanes wird dementsprechend angepasst
+	 */
+	private void gewonnenScreenVerarbeitung(boolean status, double gridOpacity) {
+		neuesSpielButton.setVisible(status);
+		gewonnenLabel.setVisible(status);
+		partieWeiterspielenButton.setVisible(status);
+		gridpane.setOpacity(gridOpacity);
+	}
+	
+	/*
+	 * Diese Methode wird ausgeführt, wenn der spielStartenButton ausgelöst wird
+	 * Die Namen der Spieler werden gesetzt und spielStartenVerarbeiten wird ausgeführt
+	 */
 	public void spielStarten() {
 		if(!spielerEins.getText().equals("") && !spielerZwei.getText().equals("")) {
-			spielerName[0] = spielerEins.getText();
-			spielerName[1] = spielerZwei.getText();
+			spielerNamenArr[0] = spielerEins.getText();
+			spielerNamenArr[1] = spielerZwei.getText();
 		}else {
-			spielerName[0] = "Spieler 1";
-			spielerName[1] = "Spieler 2";
+			spielerNamenArr[0] = "Spieler 1";
+			spielerNamenArr[1] = "Spieler 2";
 		}
+		spielStartenVerarbeiten();
+	}
+	
+	/*
+	 * Der Spielstand wird zurückgesetzt und die Oberfläche des Spiels wird für das Spiel angepasst
+	 */
+	protected void spielStartenVerarbeiten() {
+		spielstandArr[0] = 0;
+		spielstandArr[1] = 0;
 		
-		spielstand[0] = 0;
-		spielstand[1] = 0;
-		
-		spielerEinsAnzeigeLabel.setText(spielerName[0]);
-		spielerZweiAnzeigeLabel.setText(spielerName[1]);
+		spielerEinsAnzeigeLabel.setText(spielerNamenArr[0]);
+		spielerZweiAnzeigeLabel.setText(spielerNamenArr[1]);
 		spielerEinsAnzeigeLabel.setVisible(true);
 		spielerEinsAnzeige.setVisible(true);
 		spielerZweiAnzeigeLabel.setVisible(true);
 		spielerZweiAnzeige.setVisible(true);
-		
 		spielerEins.setVisible(false);
 		spielerZwei.setVisible(false);
 		spielStartenButton.setVisible(false);
@@ -255,38 +314,52 @@ public class MainController {
 		
 	}
 	
+	/*
+	 * Szene wird zur Main.fxml gewechselt und somit eine neue Instanz dieser Klasse erzeugt
+	 */
 	public void neuesSpiel(ActionEvent event) throws IOException {
-		Parent tableviewparent = FXMLLoader.load(getClass().getResource("Main.fxml"));
-		Scene tableviewscene = new Scene(tableviewparent,800,600);
+		szeneWechseln("Main.fxml",event);
+	}
+	
+	/*
+	 * Szene wird zur hauptmenue.fxml gewechselt und somit eine neue Instanz des hauptmenueControllers erzeugt
+	 */
+	public void zurueckHauptmenue(ActionEvent event) throws IOException {
+		szeneWechseln("hauptmenue.fxml",event);
+	}
+	
+	/*
+	 * Szene wird zu der im Parameter angegebenen Szene gewechselt
+	 */
+	protected void szeneWechseln(String fxml, ActionEvent event) throws IOException {
+		Parent newParent = FXMLLoader.load(getClass().getResource(fxml));
+		Scene newScene = new Scene(newParent,800,600);
 		Stage window = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		window.setScene(tableviewscene);
+		window.setScene(newScene);
 		window.show();
 	}
 	
-	public void zurueckHauptmenue(ActionEvent event) throws IOException {
-		Parent tableviewparent = FXMLLoader.load(getClass().getResource("hauptmenue.fxml"));
-		Scene tableviewscene = new Scene(tableviewparent,800,600);
-		Stage window = (Stage) ((Node)event.getSource()).getScene().getWindow();
-		window.setScene(tableviewscene);
-		window.show();
-	}
+	/*
+	 * Aktueller Spieler wird gewechselt
+	 */
 	private void wechsleSpieler() {
 		if(aktSpieler == 1) {
 			aktSpieler = 2;
 		}else if(aktSpieler == 2) {
 			aktSpieler = 1;
-		}else {
-			System.out.println("error");
 		}
 	}
+	
+	/*
+	 * Der unterste freie Button der gewählten Reihe wird entsprechend des aktuellen Spielers gefärbt
+	 */
 	private void faerbeButton(int reihe) {
 		int letzterStein = 0;
 		for(int i = 0; i <= 5; i++) {
-			if(spielfeld1.getSpielfeldAt(i, reihe) != 0) {
+			if(vierGewinntFeld.getSpielfeldAt(i, reihe) != 0) {
 				letzterStein = i;
 				break;
 			}
-			
 		}
 		String search = "ersterButton".concat(Integer.toString(letzterStein)+Integer.toString(reihe));		
 		Button zug = buttonMap.get(search);

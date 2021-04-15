@@ -12,6 +12,9 @@ public class Spielfeld {
 		spielfeldReset();
 	}
 	
+	/*
+	 * Das aktuelle Spielfeld wird an jeder Stelle auf 0 gesetzt
+	 */
 	public void spielfeldReset() {
 		for(int i = 0;i < 6; i++) {
 			for(int z = 0;z < 7;z++) {
@@ -19,22 +22,51 @@ public class Spielfeld {
 			}
 		}
 	}
+	
+	/*
+	 * Diese Methode gibt den aktuellen Stand des Steins (x|y) zurück
+	 * 0 = unbelegt;
+	 * 1 = Spieler1;
+	 * 2 = Spieler2;
+	 */
 	public int getSpielfeldAt(int y,int x) {
 		return spielfeld[y][x];
 	}
 	
+	/*
+	 * Diese Methode führt einen Spielzug aus und gibt einen Wert zurück
+	 * -2 = Fehler;
+	 * -1 = Reihe Voll;
+	 *  0 = Nicht Gewonnen;
+	 *  1 = Gewonnen;
+	 */
 	public int setzeSpieler(int reihe,int spieler) {
-		for(int i = 5; i >= 0; i--) {
-			if( spielfeld[i][reihe] == 0) {
-				spielfeld[i][reihe] = spieler;
-				return pruefeObGewonnen(i, reihe, spieler);
-			}else if(i == 0 && spielfeld[i][reihe] != 0) {
-				return REIHE_VOLL;
+		try {
+			for(int i = 5; i >= 0; i--) {
+				if( spielfeld[i][reihe] == 0 &&
+					spieler > 0 && 
+					spieler < 3 ) {
+					
+					spielfeld[i][reihe] = spieler;
+					return pruefeObGewonnen(i, reihe, spieler);
+					
+				}else if(i == 0 && spielfeld[i][reihe] != 0) {
+					return REIHE_VOLL;
+				}
 			}
+		}catch(ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return FEHLER;
 		}
 		return FEHLER;
 	}
-	public static int pruefeObGewonnen(int y,int x, int spieler) {
+	
+	/*
+	 * Diese Methode prüft, ob der durchgeführte Spielzug zum Sieg geführt hat und gibt anschließend einen Wert zurück
+	 * 0 = Nicht Gewonnen;
+	 * 1 = Gewonnen;
+	 */
+	private static int pruefeObGewonnen(int y,int x, int spieler) {
 		if(pruefeVertikal(y,x, spieler)) {
 			return GEWONNEN;
 		}
@@ -47,7 +79,12 @@ public class Spielfeld {
 		return NICHT_GEWONNEN;
 	}
 	
-	public static boolean pruefeVertikal(int y, int x, int spieler) {
+	/*
+	 * Diese Methode gibt true zurück, wenn in der Vertikalen der angegebene Spieler 4 aufeinander folgende Steine platziert hat.
+	 * true  = 4 Steine einer Farbe in einer Reihe;
+	 * false = nicht;
+	 */
+	private static boolean pruefeVertikal(int y, int x, int spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 5; i++) {
 			if(spielfeld[i][x] == spieler) {
@@ -63,7 +100,12 @@ public class Spielfeld {
 		
 	}
 	
-	public static boolean pruefeHorizontal(int y, int x, int spieler) {
+	/*
+	 * Diese Methode gibt true zurück, wenn in der Horizontalen der angegebene Spieler 4 aufeinander folgende Steine platziert hat.
+	 * true  = min. 4 Steine einer Farbe in einer Reihe;
+	 * false = nicht;
+	 */
+	private static boolean pruefeHorizontal(int y, int x, int spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 6; i++) {
 			if(spielfeld[y][i] == spieler) {
@@ -79,7 +121,12 @@ public class Spielfeld {
 		
 	}
 	
-	public static boolean pruefeDiagonal(int y, int x, int spieler) {
+	/*
+	 * Diese Methode gibt true zurück, wenn in einer Diagonalen der angegebene Spieler 4 aufeinander folgende Steine platziert hat.
+	 * true  = min. 4 Steine einer Farbe in einer Reihe;
+	 * false = nicht;
+	 */
+	private static boolean pruefeDiagonal(int y, int x, int spieler) {
 		
 		int steineEinerFarbe = 1;
 		int tempX = x,tempY = y;
@@ -151,5 +198,9 @@ public class Spielfeld {
 		
 		return false;
 		
+	}
+	
+	public int[][] getSpielfeld(){
+		return spielfeld;
 	}
 }
