@@ -84,8 +84,12 @@ public class MainComputerController extends MainController{
 		}else {
 			spielerNamenArr[0] = "Spieler 1";
 		}
-		spielerNamenArr[1] = computerSchwierigkeit.getValue().toString();
-		switch(computerSchwierigkeit.getValue().toString()) {
+		Object gewaehlteSchwierigkeit = computerSchwierigkeit.getValue();
+		if (gewaehlteSchwierigkeit == null) {
+			gewaehlteSchwierigkeit = "Einfach";
+		}
+		spielerNamenArr[1] = gewaehlteSchwierigkeit.toString();
+		switch(gewaehlteSchwierigkeit.toString()) {
 			case "Einfach":
 				difficulty = 0;
 				break;

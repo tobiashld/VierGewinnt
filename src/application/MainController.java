@@ -97,6 +97,7 @@ public class MainController {
 	
 	
 	
+	
 	public void mapInitialisieren() {
 
 		buttonMap.put("ersterButton00",ersterButton00);
@@ -212,17 +213,9 @@ public class MainController {
 	 * Der im Parameter dieser Methode angegebene Fehler wird im Spielfeld angezeigt und bleibt dort für eine Sekunde
 	 */
 	protected void fehlerVerarbeiten(String fehler){
+		FehlerAnzeigen fehleranzeige = new FehlerAnzeigen(gridpane,gewonnenLabel);
 		gewonnenLabel.setText(fehler);
-		gridpane.setOpacity(0.5);
-		gewonnenLabel.setVisible(true);
-		try {
-			wait(1);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		gridpane.setOpacity(1);
-		gewonnenLabel.setVisible(false);
+		fehleranzeige.start();
 	}
 	
 	/*
