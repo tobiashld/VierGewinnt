@@ -2,12 +2,14 @@ package application;
 
 public class SpielzugAnalyse {
 	private static int tempReihe;
+	
+	
 	/*
-	 * Gibt die Reihe zurück für den besten Spielzug
+	 * Gibt die Reihe zurück für den besten Spielzug des Schwierigkeitsgrads Mittel
 	 */
-	public static int getMittlererSpielzug(int[][] currSpielfeld) {
-		if(moeglicheAktion(currSpielfeld,2,3) ||
-		   moeglicheAktion(currSpielfeld,1,3)) {
+	public static int getMittlererSpielzug(Spielfeld currSpielfeld) {
+		if(moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER2,3) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER1,3)) {
 			
 			if(reiheVoll(currSpielfeld,tempReihe)) {
 				do{
@@ -22,14 +24,18 @@ public class SpielzugAnalyse {
 		}
 		return tempReihe;
 	}
-
-	public static int getJarvis(int[][] currSpielfeld) {
-		if(moeglicheAktion(currSpielfeld,2,3) ||
-		   moeglicheAktion(currSpielfeld,1,3) ||
-		   moeglicheAktion(currSpielfeld,2,2) ||
-		   moeglicheAktion(currSpielfeld,1,2) ||
-		   moeglicheAktion(currSpielfeld,2,1) ||
-		   moeglicheAktion(currSpielfeld,1,1) 
+	
+	
+	/*
+	 * Gibt die Reihe zurück für den besten Spielzug des Schwierigkeitsgrads Jarvis (Schwer)
+	 */
+	public static int getJarvis(Spielfeld currSpielfeld) {
+		if(moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER2,3) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER1,3) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER2,2) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER1,2) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER2,1) ||
+		   moeglicheAktion(currSpielfeld,Feldinhalt.SPIELER1,1) 
 				) {
 			if(reiheVoll(currSpielfeld,tempReihe)) {
 				do{
@@ -45,31 +51,29 @@ public class SpielzugAnalyse {
 	}
 	
 	
-	private static boolean moeglicheAktion(int[][] currSpielfeld,int spieler, int anzahlSteine) {
+	private static boolean moeglicheAktion(Spielfeld currSpielfeld,Feldinhalt spieler, int anzahlSteine) {
 		boolean tempErg = false;
 		if(pruefeVertikal(currSpielfeld,spieler,anzahlSteine) ||
 		   pruefeHorizontal(currSpielfeld,spieler,anzahlSteine) ||
 		   pruefeDiagonal(currSpielfeld,spieler,anzahlSteine)) {
 			tempErg = true;
 		}
-			
-			
 		
 		return tempErg;
 	}
 	
 	
-	private static boolean pruefeVertikal(int[][] currSpielfeld, int spieler, int anzahlSteine) {
+	private static boolean pruefeVertikal(Spielfeld currSpielfeld, Feldinhalt spieler, int anzahlSteine) {
 		int tempSteine = 0;
 		for(int i = 0; i < 7; i++) {
 			for(int z = 0; z < 6; z++) {
-				if(currSpielfeld[z][i] == spieler) {
+				if(vergleichFeldMitParameter(currSpielfeld,i,z,spieler)) {
 					tempSteine++;
-					if(tempSteine >= anzahlSteine) {
+					if(pruefeObGewollteAnzahlErreicht(tempSteine, anzahlSteine)) {
 						tempReihe = i;
 						return true;
 					}
-				}else if(currSpielfeld[z][i] == gegenspieler(spieler)) {
+				}else if(vergleichFeldMitParameter(currSpielfeld,i,z,gegenspieler(spieler)))  {
 					break;
 				}
 			}
@@ -79,46 +83,61 @@ public class SpielzugAnalyse {
 	}
 	
 	
-	private static boolean pruefeHorizontal(int[][] currSpielfeld, int spieler, int anzahlSteine) {
+	private static boolean pruefeHorizontal(Spielfeld currSpielfeld, Feldinhalt spieler, int anzahlSteine) {
 		int tempSteine = 0;
 		int lehreReihe = -2;
 		for(int z = 5; z >= 0; z--) {
 			for(int i = 0; i < 7; i++) {
-				if(tempSteine >= anzahlSteine && lehreReihe != -2) {
+				
+				if(vergleichFeldMitParameter(currSpielfeld,i,z,spieler)) {
+					tempSteine++;
+				}else if(vergleichFeldMitParameter(currSpielfeld,i,z,Feldinhalt.FELD_SETZBAR)) {
+					if(pruefeObGewollteAnzahlErreicht(tempSteine, anzahlSteine)) {
+						tempReihe = i;
+						return true;
+					}else if(lehreReihe + 1 == i){
+						lehreReihe = i;
+						tempSteine = 0;
+					}else {
+						lehreReihe = i;
+					}
+				}else if(vergleichFeldMitParameter(currSpielfeld,i,z,gegenspieler(spieler))) {
+					if(pruefeObGewollteAnzahlErreicht(tempSteine, anzahlSteine) && i - tempSteine - 1 == lehreReihe) {
+						tempReihe = lehreReihe;
+						return true;
+					}else if(pruefeObLeeresFeldZwischenErfuelltenSteinen(tempSteine, anzahlSteine, lehreReihe)){
+						lehreReihe = -2;
+						tempSteine = 0;
+					}else {
+						tempSteine = 0;
+					}
+				}else if(vergleichFeldMitParameter(currSpielfeld,i,z,Feldinhalt.FREI)) {
+					lehreReihe = -2;
+					tempSteine = 0;
+				}
+				if(pruefeObLeeresFeldZwischenErfuelltenSteinen(tempSteine,anzahlSteine,lehreReihe)) {
 					tempReihe = lehreReihe;
 					return true;
 				}
-				if(currSpielfeld[z][i] == spieler) {
-					tempSteine++;
-				}else if(currSpielfeld[z][i] == 0) {
-					if(z == 5 || currSpielfeld[z + 1][i] != 0) {
-						if(tempSteine >= anzahlSteine) {
-							tempReihe = i;
-							return true;
-						}else if(lehreReihe + 1 == i){
-							lehreReihe = i;
-							tempSteine = 0;
-						}else {
-							lehreReihe = i;
-						}
-					}
-				}else if(currSpielfeld[z][i] == gegenspieler(spieler)) {
-					if(tempSteine >= anzahlSteine && i - tempSteine - 1 == lehreReihe) {
-						tempReihe = lehreReihe;
-						return true;
-					}else {
-					tempSteine = 0;
-					}
-				}
 			}
+			
 			lehreReihe = -2;
 			tempSteine = 0;
 		}
 		return false;
 	}
 	
-	
-	private static boolean pruefeDiagonal(int[][] currSpielfeld, int spieler, int anzahlSteine) {
+	private static boolean pruefeObLeeresFeldZwischenErfuelltenSteinen(int tempSteine, int anzahlSteine, int lehreReihe) {
+		if(pruefeObGewollteAnzahlErreicht(tempSteine, anzahlSteine) && lehreReihe != -2) {
+			return true;
+		}
+		return false;
+	}
+	/*
+	 * Alle möglichen Gewinndiagonalen werden geprüft auf einen aktuellen Gewinner
+	 * 
+	 */
+	private static boolean pruefeDiagonal(Spielfeld currSpielfeld, Feldinhalt spieler, int anzahlSteine) {
 		for(int i = 0; i < 3; i++) {
 			if(pruefeDiagonaleLogik(currSpielfeld,spieler,anzahlSteine,"rechts",i,0) || 
 			   pruefeDiagonaleLogik(currSpielfeld,spieler,anzahlSteine,"rechts",0,i) && i != 0 ||
@@ -139,7 +158,7 @@ public class SpielzugAnalyse {
 		return false;
 	}
 	
-	private static boolean pruefeDiagonaleLogik(int[][] currSpielfeld, int spieler, int anzahlSteine, String richtung,int y, int x) {
+	private static boolean pruefeDiagonaleLogik(Spielfeld currSpielfeld, Feldinhalt spieler, int anzahlSteine, String richtung,int y, int x) {
 		int tempSteine = 0;
 		int lehreReihe = -2;
 		int richtungX = 0;
@@ -152,16 +171,17 @@ public class SpielzugAnalyse {
 				break;
 		}
 		for(int i = y; i < 6; i++) {
+			int newX = x + (i - y) * richtungX;
 			try {
-				if(tempSteine >= anzahlSteine && lehreReihe != -2) {
+				if(pruefeObLeeresFeldZwischenErfuelltenSteinen(tempSteine, anzahlSteine, lehreReihe)) {
 					tempReihe = lehreReihe;
 					return true;
 				}
-				int newX = x + (i - y) * richtungX;
-				if(currSpielfeld[i][newX] == spieler) {
+				
+				if(vergleichFeldMitParameter(currSpielfeld,newX,i,spieler)) {
 					tempSteine++;
-				}else if(currSpielfeld[i][newX] == gegenspieler(spieler)) {
-					if(tempSteine >= anzahlSteine && 
+				}else if(vergleichFeldMitParameter(currSpielfeld,newX,i,gegenspieler(spieler))) {
+					if(pruefeObGewollteAnzahlErreicht(tempSteine, anzahlSteine) && 
 						newX - ((tempSteine + 1) * richtungX) == lehreReihe && 
 						lehreReihe != -2) {
 						tempReihe = lehreReihe;
@@ -169,46 +189,49 @@ public class SpielzugAnalyse {
 					}else {
 						tempSteine = 0;
 					}
-				}else if(currSpielfeld[i][newX] == 0) {
-					if(i == 5 || currSpielfeld[i + 1][newX] != 0) {
-						if(lehreReihe - richtungX == (newX)) {
-							lehreReihe = newX;
-							tempSteine = 0;
-						}else if(tempSteine >= anzahlSteine && lehreReihe != -2) {
-							tempReihe = lehreReihe;
-							return true;
-						}else {
-							lehreReihe = newX;
-						}
+				}else if(vergleichFeldMitParameter(currSpielfeld,newX,i,Feldinhalt.FELD_SETZBAR)) {
+					if(lehreReihe - richtungX == (newX)) {
+						lehreReihe = newX;
+						tempSteine = 0;
+					}else if(pruefeObLeeresFeldZwischenErfuelltenSteinen(tempSteine, anzahlSteine, lehreReihe)) {
+						tempReihe = lehreReihe;
+						return true;
+					}else {
+						lehreReihe = newX;
 					}
-				}else{
-					break;
 				}
-				if(tempSteine >= anzahlSteine && lehreReihe != -2) {
+				if(pruefeObLeeresFeldZwischenErfuelltenSteinen(tempSteine, anzahlSteine, lehreReihe)) {
 					tempReihe = lehreReihe;
 					return true;
 				}
-			}catch(ArrayIndexOutOfBoundsException event) {
+			}catch(ArrayIndexOutOfBoundsException e) {
 				break;
 			}
+	
 		}
 		
 		return false;
 	}
 	
-	
-	private static int gegenspieler(int spieler) {
-		if(spieler == 1) {
-			return 2;
-		}else if(spieler == 2) {
-			return 1;
-		}else {
-			return 0;
-		}
+	private static boolean pruefeObGewollteAnzahlErreicht(int tempSteine, int anzahlSteine) {
+		return (tempSteine >= anzahlSteine)?true:false;
 	}
 	
-	public static boolean reiheVoll(int[][] currSpielfeld,int reihe) {
-		if(currSpielfeld[0][reihe] != 0) {
+	private static boolean vergleichFeldMitParameter(Spielfeld currSpielfeld,int x, int y, Feldinhalt parameter) {
+		return currSpielfeld.getFeldAt(x, y).getFeldinhalt().equals(parameter);
+	}
+	
+	private static Feldinhalt gegenspieler(Feldinhalt spieler) {
+		switch(spieler) {
+			case SPIELER1:return Feldinhalt.SPIELER2;
+			case SPIELER2:return Feldinhalt.SPIELER1;
+		}
+		return Feldinhalt.ERROR;
+	}
+	
+	public static boolean reiheVoll(Spielfeld currSpielfeld,int reihe) {
+		if(currSpielfeld.getFeldAt(reihe, 0).getFeldinhalt().equals(Feldinhalt.SPIELER1) ||
+		   currSpielfeld.getFeldAt(reihe, 0).getFeldinhalt().equals(Feldinhalt.SPIELER2)	) {
 			return true;
 		}else {
 			return false;
@@ -217,22 +240,7 @@ public class SpielzugAnalyse {
 	}
 	
 	
-	public static class Spielfeld {
-		
-		Feld[][] spielFeld = new Feld[6][7];
-	}
+
 	
-	public static class Feld {
-		int indexX;
-		int indexY;
-		
-		Feldinhalt feldinhalt;
-	}
 	
-	public static enum Feldinhalt {
-		ROT,
-		GELB,
-		FREI,
-		NICHT_SETZBAR
-	}
 }

@@ -23,9 +23,13 @@ public class MainController {
 	
 	Spielfeld vierGewinntFeld = new Spielfeld();
 	HashMap<String,Button> buttonMap = new HashMap<>();
-	int aktSpieler = 1;
+	Feldinhalt aktSpieler = Feldinhalt.SPIELER1;
 	String[] spielerNamenArr = new String[2];
 	int[] spielstandArr = new int[2];
+	int letzteReiheSpieler1 = -2;
+	int letzteZeileSpieler1 = -2;
+	int letzteReiheSpieler2 = -2;
+	int letzteZeileSpieler2 = -2;
 	
 	@FXML
 	public Button ersterButton00 = new Button();
@@ -205,6 +209,9 @@ public class MainController {
 				faerbeButton(reihe);
 				System.out.println("gewonnen");
 				displayGewonnenScreen(event);
+				if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
+					wechsleSpieler();
+				}
 				break;		
 		}
 	}
@@ -227,16 +234,16 @@ public class MainController {
 			Button temp_button = buttonMap.get(s);
 			temp_button.setDisable(true);
 		}
-		spielstandArr[aktSpieler-1]++;
+		spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]++;
 		
-		if(aktSpieler == 1) {
-			spielerEinsAnzeige.setText(Integer.toString(spielstandArr[aktSpieler-1]));
-		}else if(aktSpieler == 2) {
-			spielerZweiAnzeige.setText(Integer.toString(spielstandArr[aktSpieler-1]));
+		if(aktSpieler.equals(Feldinhalt.SPIELER1)) {
+			spielerEinsAnzeige.setText(Integer.toString(spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]));
+		}else if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
+			spielerZweiAnzeige.setText(Integer.toString(spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]));
 		}
 		
 		gewonnenScreenVerarbeitung(true, 0.5);
-		gewonnenLabel.setText(spielerNamenArr[aktSpieler-1] + " hat gewonnen!");
+		gewonnenLabel.setText(spielerNamenArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1] + " hat gewonnen!");
 		
 		
 	}
@@ -254,7 +261,10 @@ public class MainController {
 			temp_button.setStyle("-fx-background-radius:80px;");
 			temp_button.setDisable(false);
 		}
-		
+		letzteReiheSpieler1 = -2;
+		letzteZeileSpieler1 = -2;
+		letzteReiheSpieler2 = -2;
+		letzteZeileSpieler2 = -2;
 		gewonnenScreenVerarbeitung(false, 1);
 		vierGewinntFeld.spielfeldReset();
 	}
@@ -336,10 +346,10 @@ public class MainController {
 	 * Aktueller Spieler wird gewechselt
 	 */
 	private void wechsleSpieler() {
-		if(aktSpieler == 1) {
-			aktSpieler = 2;
-		}else if(aktSpieler == 2) {
-			aktSpieler = 1;
+		if(aktSpieler.equals(Feldinhalt.SPIELER1)) {
+			aktSpieler = Feldinhalt.SPIELER2;
+		}else if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
+			aktSpieler = Feldinhalt.SPIELER1;
 		}
 	}
 	
@@ -347,23 +357,40 @@ public class MainController {
 	 * Der unterste freie Button der gewählten Reihe wird entsprechend des aktuellen Spielers gefärbt
 	 */
 	private void faerbeButton(int reihe) {
-		int letzterStein = 0;
+		
+		Button aktButton = getButton(reihe,getLetzterStein(reihe));
+		if(aktSpieler.equals(Feldinhalt.SPIELER1)) {
+			aktButton.setStyle("-fx-background-color:red;-fx-background-radius:80px;");
+			if(letzteZeileSpieler1 != -2) {
+				Button letzterButton = getButton(letzteReiheSpieler1,letzteZeileSpieler1);
+				letzterButton.setDisable(true);
+			}
+			letzteReiheSpieler1 = reihe;
+			letzteZeileSpieler1 = getLetzterStein(reihe);
+			
+		}else if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
+			aktButton.setStyle("-fx-background-color:yellow;-fx-background-radius:80px;");
+			if(letzteZeileSpieler2 != -2) {
+				Button letzterButton = getButton(letzteReiheSpieler2,letzteZeileSpieler2);
+				letzterButton.setDisable(true);
+			}
+			letzteReiheSpieler2 = reihe;
+			letzteZeileSpieler2 = getLetzterStein(reihe);
+		}
+	}
+	
+	private Button getButton(int reihe, int zeile) {
+		String search = "ersterButton".concat(Integer.toString(zeile)+Integer.toString(reihe));		
+		return buttonMap.get(search);
+	}
+	private int getLetzterStein(int reihe) {
 		for(int i = 0; i <= 5; i++) {
-			if(vierGewinntFeld.getSpielfeldAt(i, reihe) != 0) {
-				letzterStein = i;
-				break;
+			if(vierGewinntFeld.getSpielfeldAt(i, reihe).getFeldinhalt().equals(Feldinhalt.SPIELER1) ||
+			   vierGewinntFeld.getSpielfeldAt(i, reihe).getFeldinhalt().equals(Feldinhalt.SPIELER2)) {
+				return i;
 			}
 		}
-		String search = "ersterButton".concat(Integer.toString(letzterStein)+Integer.toString(reihe));		
-		Button zug = buttonMap.get(search);
-		if(aktSpieler == 1) {
-			zug.setStyle("-fx-background-color:red;-fx-background-radius:80px;");
-			zug.setDisable(true);
-			
-		}else if(aktSpieler == 2) {
-			zug.setStyle("-fx-background-color:yellow;-fx-background-radius:80px;");
-			zug.setDisable(true);
-		}
+		return 0;
 	}
 	
 	

@@ -12,6 +12,7 @@ public class MainComputerController extends MainController{
 	
 	private int difficulty;
 	
+	
 	@FXML
 	public ChoiceBox computerSchwierigkeit = new ChoiceBox();
 	
@@ -23,7 +24,7 @@ public class MainComputerController extends MainController{
 	@Override
 	public void verarbeiteSpielzug(int reihe,ActionEvent event) throws IOException {
 		super.verarbeiteSpielzug(reihe, event);
-		if(aktSpieler == 2) {
+		if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
 			verarbeiteComputerSpielzug();
 		}
 	}
@@ -33,6 +34,7 @@ public class MainComputerController extends MainController{
 		computerSchwierigkeit.getItems().add("Einfach");
 		computerSchwierigkeit.getItems().add("Mittel");
 		computerSchwierigkeit.getItems().add("Jarvis");
+		
 		
 	}
 	
@@ -61,16 +63,16 @@ public class MainComputerController extends MainController{
 		int tempReihe;
 		do {
 			tempReihe = (int) (Math.random()*7);
-		}while(SpielzugAnalyse.reiheVoll(super.vierGewinntFeld.getSpielfeld(), tempReihe));
+		}while(SpielzugAnalyse.reiheVoll(super.vierGewinntFeld, tempReihe));
 		return tempReihe;
 	}
 	
 	private int mittlereSpielzugauswahl() {
-		return SpielzugAnalyse.getMittlererSpielzug(super.vierGewinntFeld.getSpielfeld());
+		return SpielzugAnalyse.getMittlererSpielzug(super.vierGewinntFeld);
 	}
 	
 	private int jarvis() {
-		return SpielzugAnalyse.getJarvis(super.vierGewinntFeld.getSpielfeld());
+		return SpielzugAnalyse.getJarvis(super.vierGewinntFeld);
 	}
 	
 	/*

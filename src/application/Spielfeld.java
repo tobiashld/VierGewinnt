@@ -1,12 +1,15 @@
 package application;
 
+
+
 public class Spielfeld {
 	
+
 	private static final int GEWONNEN = 1;
 	private static final int NICHT_GEWONNEN = 0;
 	private static final int FEHLER = -2;
 	private static final int REIHE_VOLL = -1;
-	private static int[][] spielfeld = new int[6][7];
+	private static Feld[][] spielfeld = new Feld[6][7];
 	
 	public Spielfeld() {
 		spielfeldReset();
@@ -16,10 +19,13 @@ public class Spielfeld {
 	 * Das aktuelle Spielfeld wird an jeder Stelle auf 0 gesetzt
 	 */
 	public void spielfeldReset() {
-		for(int i = 0;i < 6; i++) {
+		for(int i = 0;i < 5; i++) {
 			for(int z = 0;z < 7;z++) {
-				spielfeld[i][z] = 0;
+				spielfeld[i][z] = new Feld(z,i,Feldinhalt.FREI);
 			}
+		}
+		for(int i = 0;i < 7;i++) {
+			spielfeld[5][i] = new Feld(i,5,Feldinhalt.FELD_SETZBAR);
 		}
 	}
 	
@@ -29,7 +35,7 @@ public class Spielfeld {
 	 * 1 = Spieler1;
 	 * 2 = Spieler2;
 	 */
-	public int getSpielfeldAt(int y,int x) {
+	public Feld getSpielfeldAt(int y,int x) {
 		return spielfeld[y][x];
 	}
 	
@@ -40,17 +46,20 @@ public class Spielfeld {
 	 *  0 = Nicht Gewonnen;
 	 *  1 = Gewonnen;
 	 */
-	public int setzeSpieler(int reihe,int spieler) {
+	public int setzeSpieler(int reihe,Feldinhalt spieler) {
 		try {
 			for(int i = 5; i >= 0; i--) {
-				if( spielfeld[i][reihe] == 0 &&
-					spieler > 0 && 
-					spieler < 3 ) {
+				if( spielfeld[i][reihe].feldinhalt.equals(Feldinhalt.FELD_SETZBAR) &&
+					(spieler.equals(Feldinhalt.SPIELER1) ||
+					spieler.equals(Feldinhalt.SPIELER2))) {
 					
-					spielfeld[i][reihe] = spieler;
+					spielfeld[i][reihe].setFeldinhalt(spieler);
+					if(i != 0) {
+						spielfeld[i-1][reihe].setFeldinhalt(Feldinhalt.FELD_SETZBAR);
+					}
 					return pruefeObGewonnen(i, reihe, spieler);
 					
-				}else if(i == 0 && spielfeld[i][reihe] != 0) {
+				}else if(i == 0) {
 					return REIHE_VOLL;
 				}
 			}
@@ -66,7 +75,7 @@ public class Spielfeld {
 	 * 0 = Nicht Gewonnen;
 	 * 1 = Gewonnen;
 	 */
-	private static int pruefeObGewonnen(int y,int x, int spieler) {
+	private static int pruefeObGewonnen(int y,int x, Feldinhalt spieler) {
 		if(pruefeVertikal(y,x, spieler)) {
 			return GEWONNEN;
 		}
@@ -84,10 +93,10 @@ public class Spielfeld {
 	 * true  = 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeVertikal(int y, int x, int spieler) {
+	private static boolean pruefeVertikal(int y, int x, Feldinhalt spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 5; i++) {
-			if(spielfeld[i][x] == spieler) {
+			if(spielfeld[i][x].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 				if(steineEinerFarbe >= 4) {
 					return true;
@@ -105,10 +114,10 @@ public class Spielfeld {
 	 * true  = min. 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeHorizontal(int y, int x, int spieler) {
+	private static boolean pruefeHorizontal(int y, int x, Feldinhalt spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 6; i++) {
-			if(spielfeld[y][i] == spieler) {
+			if(spielfeld[y][i].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 				if(steineEinerFarbe >= 4) {
 					return true;
@@ -126,7 +135,7 @@ public class Spielfeld {
 	 * true  = min. 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeDiagonal(int y, int x, int spieler) {
+	private static boolean pruefeDiagonal(int y, int x, Feldinhalt spieler) {
 		
 		int steineEinerFarbe = 1;
 		int tempX = x,tempY = y;
@@ -136,7 +145,7 @@ public class Spielfeld {
 		while(steineEinerFarbe < 5 && tempX > 0 && tempY > 0) {
 			tempX--;
 			tempY--;
-			if(spielfeld[tempY][tempX] == spieler) {
+			if(spielfeld[tempY][tempX].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 			}else{
 				break;
@@ -150,7 +159,7 @@ public class Spielfeld {
 		while(steineEinerFarbe < 5 && tempX < 6 && tempY < 5) {
 			tempX++;
 			tempY++;
-			if(spielfeld[tempY][tempX] == spieler) {
+			if(spielfeld[tempY][tempX].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 			}else{
 				break;
@@ -172,7 +181,7 @@ public class Spielfeld {
 		while(steineEinerFarbe < 5 && tempX < 6 && tempY > 0) {
 			tempX++;
 			tempY--;
-			if(spielfeld[tempY][tempX] == spieler) {
+			if(spielfeld[tempY][tempX].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 			}else{
 				break;
@@ -186,7 +195,7 @@ public class Spielfeld {
 		while(steineEinerFarbe < 5 && tempX > 0 && tempY < 5) {
 			tempX--;
 			tempY++;
-			if(spielfeld[tempY][tempX] == spieler) {
+			if(spielfeld[tempY][tempX].getFeldinhalt().equals(spieler)) {
 				steineEinerFarbe++;
 			}else{
 				break;
@@ -200,7 +209,21 @@ public class Spielfeld {
 		
 	}
 	
-	public int[][] getSpielfeld(){
+	public Feld[][] getSpielfeld(){
 		return spielfeld;
 	}
+	
+	public Feld getFeldAt(int x, int y) {
+		return spielfeld[y][x];
+	}
+	
+	public int getSpielerInt(Feldinhalt spieler) {
+		switch(spieler) {
+			case SPIELER1:return 1;
+			case SPIELER2:return 2;
+			default:return 0;
+		}
+	}
+	
+	
 }
