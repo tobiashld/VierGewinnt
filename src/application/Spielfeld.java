@@ -4,15 +4,34 @@ package application;
 
 public class Spielfeld {
 	
-
+	private static final int FELD_VOLL = 2;
 	private static final int GEWONNEN = 1;
 	private static final int NICHT_GEWONNEN = 0;
 	private static final int FEHLER = -2;
 	private static final int REIHE_VOLL = -1;
-	private static Feld[][] spielfeld = new Feld[6][7];
+	private Feld[][] spielfeld = new Feld[6][7];
 	
 	public Spielfeld() {
 		spielfeldReset();
+	}
+	public void setOldSpielfeld(Spielfeld currSpielfeld) {
+		for(int i = 0;i < 6; i++) {
+			for(int z = 0;z < 7;z++) {
+				spielfeld[i][z] = new Feld(z,i,currSpielfeld.getFeldAt(z, i).getFeldinhalt());
+			}
+		}
+	}
+	
+	
+	
+	public void spielfeldResetLetzterSteinReiheAt(int reihe) {
+		for(int i = 0; i < 6; i++) {
+			if(spielfeld[i][reihe].getFeldinhalt().equals(Feldinhalt.SPIELER1) ||
+			   spielfeld[i][reihe].getFeldinhalt().equals(Feldinhalt.SPIELER2)) {
+				spielfeld[i][reihe].setFeldinhalt(Feldinhalt.FELD_SETZBAR);
+				break;
+			}
+		}
 	}
 	
 	/*
@@ -38,6 +57,18 @@ public class Spielfeld {
 	public Feld getSpielfeldAt(int y,int x) {
 		return spielfeld[y][x];
 	}
+	
+	
+	private boolean feldVoll() {
+		int zaehler = 0;
+		for(int i = 0; i < 7; i++) {
+			if(reiheVoll(i)) {
+				zaehler++;
+			}
+		}
+		return (zaehler >= 7)?true:false;
+	}
+	
 	
 	/*
 	 * Diese Methode führt einen Spielzug aus und gibt einen Wert zurück
@@ -75,7 +106,7 @@ public class Spielfeld {
 	 * 0 = Nicht Gewonnen;
 	 * 1 = Gewonnen;
 	 */
-	private static int pruefeObGewonnen(int y,int x, Feldinhalt spieler) {
+	private int pruefeObGewonnen(int y,int x, Feldinhalt spieler) {
 		if(pruefeVertikal(y,x, spieler)) {
 			return GEWONNEN;
 		}
@@ -85,15 +116,32 @@ public class Spielfeld {
 		if(pruefeDiagonal(y,x, spieler)) {
 			return GEWONNEN;
 		}
+		if(feldVoll()) {
+			return FELD_VOLL;
+		}
 		return NICHT_GEWONNEN;
 	}
+	
+	
+	
+	public boolean reiheVoll(int reihe) {
+		if(this.getFeldAt(reihe, 0).getFeldinhalt().equals(Feldinhalt.SPIELER1) ||
+		   this.getFeldAt(reihe, 0).getFeldinhalt().equals(Feldinhalt.SPIELER2)	) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+	
+	
 	
 	/*
 	 * Diese Methode gibt true zurück, wenn in der Vertikalen der angegebene Spieler 4 aufeinander folgende Steine platziert hat.
 	 * true  = 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeVertikal(int y, int x, Feldinhalt spieler) {
+	private boolean pruefeVertikal(int y, int x, Feldinhalt spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 5; i++) {
 			if(spielfeld[i][x].getFeldinhalt().equals(spieler)) {
@@ -114,7 +162,7 @@ public class Spielfeld {
 	 * true  = min. 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeHorizontal(int y, int x, Feldinhalt spieler) {
+	private boolean pruefeHorizontal(int y, int x, Feldinhalt spieler) {
 		int steineEinerFarbe = 0;
 		for(int i = 0; i <= 6; i++) {
 			if(spielfeld[y][i].getFeldinhalt().equals(spieler)) {
@@ -135,7 +183,7 @@ public class Spielfeld {
 	 * true  = min. 4 Steine einer Farbe in einer Reihe;
 	 * false = nicht;
 	 */
-	private static boolean pruefeDiagonal(int y, int x, Feldinhalt spieler) {
+	private boolean pruefeDiagonal(int y, int x, Feldinhalt spieler) {
 		
 		int steineEinerFarbe = 1;
 		int tempX = x,tempY = y;

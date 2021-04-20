@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import application.Feldinhalt;
 import application.Spielfeld;
 
 /**
@@ -28,7 +29,7 @@ class SpielfeldUnitTest {
 	@Test
 	void testSetzeSpieler() {
 		Spielfeld spielfeldTest = new Spielfeld();
-		spielfeldTest.setzeSpieler(0, 1);
+		spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1);
 		assertEquals(1, spielfeldTest.getSpielfeldAt(5,0));
 	}
 	
@@ -38,32 +39,32 @@ class SpielfeldUnitTest {
 		/*
 		 * Das setzen eines Steins wird überprüft
 		 */
-		spielfeldTest.setzeSpieler(0, 1);
+		spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1);
 		assertEquals(1, spielfeldTest.getSpielfeldAt(5,0));
 		
 		/*
 		 * Reihe Voll wird überprüft
 		 */
-		assertEquals(0,spielfeldTest.setzeSpieler(0, 1));
-		assertEquals(0,spielfeldTest.setzeSpieler(0, 1));
-		assertEquals(0,spielfeldTest.setzeSpieler(0, 2));
-		assertEquals(0,spielfeldTest.setzeSpieler(0, 1));
-		assertEquals(0,spielfeldTest.setzeSpieler(0, 1));
-		assertEquals(-1,spielfeldTest.setzeSpieler(0, 1));
+		assertEquals(0,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1));
+		assertEquals(0,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1));
+		assertEquals(0,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER2));
+		assertEquals(0,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1));
+		assertEquals(0,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1));
+		assertEquals(-1,spielfeldTest.setzeSpieler(0, Feldinhalt.SPIELER1));
 		
 		/*
 		 * Prüfen ob gewonnen wird
 		 */
-		assertEquals(0,spielfeldTest.setzeSpieler(1, 1));
-		assertEquals(0,spielfeldTest.setzeSpieler(1, 1));
-		assertEquals(0,spielfeldTest.setzeSpieler(1, 1));
-		assertEquals(1,spielfeldTest.setzeSpieler(1, 1));
+		assertEquals(0,spielfeldTest.setzeSpieler(1, Feldinhalt.SPIELER1));
+		assertEquals(0,spielfeldTest.setzeSpieler(1, Feldinhalt.SPIELER1));
+		assertEquals(0,spielfeldTest.setzeSpieler(1, Feldinhalt.SPIELER1));
+		assertEquals(1,spielfeldTest.setzeSpieler(1, Feldinhalt.SPIELER1));
 		
 		/*
 		 * Prüfen ob Fehler geworfen wird
 		 */
-		assertEquals(-2,spielfeldTest.setzeSpieler(8, 1));
-		assertEquals(-2,spielfeldTest.setzeSpieler(5, 3));
+		assertEquals(-2,spielfeldTest.setzeSpieler(8, Feldinhalt.SPIELER1));
+		assertEquals(-2,spielfeldTest.setzeSpieler(5, Feldinhalt.ERROR));
 		
 	}
 

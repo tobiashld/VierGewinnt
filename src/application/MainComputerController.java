@@ -2,8 +2,6 @@ package application;
 
 import java.io.IOException;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -11,10 +9,10 @@ import javafx.scene.control.ChoiceBox;
 public class MainComputerController extends MainController{
 	
 	private int difficulty;
-	
+	private SpielzugAnalyse spielzugAnalyse = new SpielzugAnalyse();
 	
 	@FXML
-	public ChoiceBox computerSchwierigkeit = new ChoiceBox();
+	public ChoiceBox<String> computerSchwierigkeit = new ChoiceBox<>();
 	
 	
 	/*
@@ -63,16 +61,16 @@ public class MainComputerController extends MainController{
 		int tempReihe;
 		do {
 			tempReihe = (int) (Math.random()*7);
-		}while(SpielzugAnalyse.reiheVoll(super.vierGewinntFeld, tempReihe));
+		}while(super.vierGewinntFeld.reiheVoll(tempReihe));
 		return tempReihe;
 	}
 	
 	private int mittlereSpielzugauswahl() {
-		return SpielzugAnalyse.getMittlererSpielzug(super.vierGewinntFeld);
+		return spielzugAnalyse.getMittlererSpielzug(super.vierGewinntFeld);
 	}
 	
 	private int jarvis() {
-		return SpielzugAnalyse.getJarvis(super.vierGewinntFeld);
+		return spielzugAnalyse.getJarvis(super.vierGewinntFeld);
 	}
 	
 	/*

@@ -16,6 +16,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class MainController {
+	private static final int FELD_VOLL = 2;
 	private static final int GEWONNEN = 1;
 	private static final int NICHT_GEWONNEN = 0;
 	private static final int REIHE_VOLL = -1;
@@ -191,12 +192,10 @@ public class MainController {
 		int tempErg = vierGewinntFeld.setzeSpieler(reihe, aktSpieler);
 		switch(tempErg) {
 			case FEHLER:
-				System.out.println("Fehler");
 				fehlerVerarbeiten("Fehler!");
 				break;
 						
 			case REIHE_VOLL:
-				System.out.println("Reihe Voll");
 				fehlerVerarbeiten("Reihe Voll!");
 				break;
 							
@@ -207,12 +206,16 @@ public class MainController {
 								
 			case GEWONNEN:
 				faerbeButton(reihe);
-				System.out.println("gewonnen");
 				displayGewonnenScreen(event);
 				if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
 					wechsleSpieler();
 				}
-				break;		
+				break;	
+			case FELD_VOLL:
+				fehlerVerarbeiten("Feld Voll!");
+				partieWeiterspielen();
+				break;
+				
 		}
 	}
 	
@@ -261,6 +264,7 @@ public class MainController {
 			temp_button.setStyle("-fx-background-radius:80px;");
 			temp_button.setDisable(false);
 		}
+		
 		letzteReiheSpieler1 = -2;
 		letzteZeileSpieler1 = -2;
 		letzteReiheSpieler2 = -2;
