@@ -27,10 +27,7 @@ public class MainController {
 	Feldinhalt aktSpieler = Feldinhalt.SPIELER1;
 	String[] spielerNamenArr = new String[2];
 	int[] spielstandArr = new int[2];
-	int letzteReiheSpieler1 = -2;
-	int letzteZeileSpieler1 = -2;
-	int letzteReiheSpieler2 = -2;
-	int letzteZeileSpieler2 = -2;
+
 	
 	@FXML
 	public Button ersterButton00 = new Button();
@@ -239,9 +236,9 @@ public class MainController {
 		}
 		spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]++;
 		
-		if(aktSpieler.equals(Feldinhalt.SPIELER1)) {
+		if(Feldinhalt.SPIELER1.equals(aktSpieler)) {
 			spielerEinsAnzeige.setText(Integer.toString(spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]));
-		}else if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
+		}else if(Feldinhalt.SPIELER2.equals(aktSpieler)) {
 			spielerZweiAnzeige.setText(Integer.toString(spielstandArr[vierGewinntFeld.getSpielerInt(aktSpieler)-1]));
 		}
 		
@@ -265,10 +262,6 @@ public class MainController {
 			temp_button.setDisable(false);
 		}
 		
-		letzteReiheSpieler1 = -2;
-		letzteZeileSpieler1 = -2;
-		letzteReiheSpieler2 = -2;
-		letzteZeileSpieler2 = -2;
 		gewonnenScreenVerarbeitung(false, 1);
 		vierGewinntFeld.spielfeldReset();
 	}
@@ -289,6 +282,7 @@ public class MainController {
 	 * Die Namen der Spieler werden gesetzt und spielStartenVerarbeiten wird ausgeführt
 	 */
 	public void spielStarten() {
+		//TODO validiere Spielername
 		if(!spielerEins.getText().equals("") && !spielerZwei.getText().equals("")) {
 			spielerNamenArr[0] = spielerEins.getText();
 			spielerNamenArr[1] = spielerZwei.getText();
@@ -365,21 +359,11 @@ public class MainController {
 		Button aktButton = getButton(reihe,getLetzterStein(reihe));
 		if(aktSpieler.equals(Feldinhalt.SPIELER1)) {
 			aktButton.setStyle("-fx-background-color:red;-fx-background-radius:80px;");
-			if(letzteZeileSpieler1 != -2) {
-				Button letzterButton = getButton(letzteReiheSpieler1,letzteZeileSpieler1);
-				letzterButton.setDisable(true);
-			}
-			letzteReiheSpieler1 = reihe;
-			letzteZeileSpieler1 = getLetzterStein(reihe);
-			
+			aktButton.setDisable(true);
 		}else if(aktSpieler.equals(Feldinhalt.SPIELER2)) {
 			aktButton.setStyle("-fx-background-color:yellow;-fx-background-radius:80px;");
-			if(letzteZeileSpieler2 != -2) {
-				Button letzterButton = getButton(letzteReiheSpieler2,letzteZeileSpieler2);
-				letzterButton.setDisable(true);
-			}
-			letzteReiheSpieler2 = reihe;
-			letzteZeileSpieler2 = getLetzterStein(reihe);
+			aktButton.setDisable(true);
+			
 		}
 	}
 	
